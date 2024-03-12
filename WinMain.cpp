@@ -1,15 +1,11 @@
 #include <Windows.h>
+#include"Window.h"
 
-LRESULT CALLBACK WndProc(HWND hWnd,UINT msg,WPARAM wParam, LPARAM Lparam) 
-{
-    switch (msg)
-    {
-    case WM_CLOSE :
-        PostQuitMessage(1);
-        break;
-    }
-    return DefWindowProc(hWnd, msg, wParam, Lparam);
-}
+//These can be commented out after debugging
+#include <string>
+#include <sstream>
+//Comment out
+
 
 
 int APIENTRY wWinMain(
@@ -19,32 +15,8 @@ int APIENTRY wWinMain(
     _In_     int                      nCmdShow
 )
 {
-    //Register Windows Class
-    const LPCWSTR className = L"render3d";
-    WNDCLASSEX wc = { 0 };
-    wc.cbSize = sizeof(wc);
-    wc.style = CS_OWNDC;
-    wc.lpfnWndProc = WndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = hInstance;
-    wc.hIcon = nullptr;
-    wc.hCursor = nullptr;
-    wc.hbrBackground = nullptr;
-    wc.lpszClassName = className;
-    wc.hIconSm = nullptr;
-    RegisterClassEx(&wc);
-    //Initialize Window instance
-    HWND hWnd = CreateWindowEx
-    (0, className,
-        L"3DRenderEngine",
-        WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU , 
-        200, 200 , 640 , 480,
-        nullptr, nullptr, hInstance, nullptr
-    );
-    //Function to show the window ;D
-    ShowWindow(hWnd, SW_SHOW);
-    
+    Window wnd(800,600,"3D Render Engine");
+
     //msg handling 
     MSG msg;
     BOOL result;
@@ -57,12 +29,9 @@ int APIENTRY wWinMain(
     {
         return -1;
     }
-    else 
-    {
-        return msg.wParam;
-    }
     
-    return 0;
+    return (int)msg.wParam;
+
 }
 
 
