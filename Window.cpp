@@ -1,7 +1,57 @@
 #include "Window.h"
+#include <sstream>
 
 Window::WindowClass Window::WindowClass::wndClass;
 
+Window::Exception::Exception(int line, const char* file, HRESULT hr) noexcept
+    :
+    WndException(line , file),
+    hr(hr)
+{
+}
+
+const char* Window::Exception::what()const noexcept
+{
+    std::stringstream ss;
+    ss << GetType() << std::endl
+        << "[Error Code]" << GetErrorCode() << std::endl
+        << "[Description]" << GetErrorString() << std::endl
+        << GetOriginString();
+    return ss.str().c_str();
+}
+
+const char* Window::Exception::GetType() const noexcept 
+{
+    return "Wnd Window Exception";
+}
+
+std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
+{
+    char* pMsgBuf = nullptr;
+    DWORD nMsgLen = FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER|
+        FORMAT_MESSAGE_FROM_SYSTEM| FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr,hr,MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),
+        reinterpret_cast<LPSTR>(&pMsgBuf),0,nullptr
+        );
+    if (nMsgLen == 0)
+    {
+        return "Unidentified error code";
+    }
+    std::string errorString = pMsgBuf;
+    LocalFree(pMsgBuf);
+    return errorString;
+}
+
+HRESULT Window::Exception::GetErrorCode() const noexcept
+{
+    return hr;
+}
+
+std::string Window::Exception::GetErrorString() const noexcept
+{
+    return TranslateErrorCode(hr);
+}
 
 Window::WindowClass::WindowClass() noexcept
 	:
@@ -42,7 +92,7 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 
 
 
-Window::Window(int width, int height, const char* name) noexcept
+Window::Window(int width, int height, const char* name)
     :
     width(width),
     height(height)
@@ -52,21 +102,22 @@ Window::Window(int width, int height, const char* name) noexcept
     wr.left = 100;
     wr.right = wr.left + width;
     wr.top = 100;
-    wr.bottom = wr.top + height;   
-    AdjustWindowRect(&wr,WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU,FALSE);
+    wr.bottom = wr.top + height; 
+    if ( FAILED(AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE)))
+    {
+        throw WND_LAST_EXCEPT();
+    }
+    
     //Initialize Window instance
     hWnd = CreateWindow(WindowClass::GetName(), name,
         WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU,
         CW_USEDEFAULT,CW_USEDEFAULT,wr.right - wr.left,wr.bottom - wr.top,nullptr,nullptr,
         WindowClass::GetInstance(),this
         );
-    //hWnd = CreateWindowEx(0,
-    //    WindowClass::GetName(),name,
-    //    WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
-    //    wr.right - wr.left, wr.bottom - wr.top,nullptr,nullptr, WindowClass::GetInstance(),
-    //    this
-    //    );
-
+    if (hWnd == nullptr)
+    {
+        throw WND_LAST_EXCEPT();
+    }
     //Function to show the window ;D
     ShowWindow(hWnd, SW_SHOWDEFAULT);
 }
