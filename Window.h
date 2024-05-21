@@ -1,6 +1,7 @@
 #pragma once
 #include "WindowsMisc.h"
 #include "WindException.h"
+#include "Keyboard.h"
 
 
 class Window
@@ -29,7 +30,7 @@ private:
 		~WindowClass();
 		WindowClass(const WindowClass&)= delete;
 		WindowClass& operator=(const WindowClass&) = delete;
-		static constexpr const char* wndClassName = "3D Render Engine";
+		static constexpr const char* wndClassName = "Retr0 Engine";
 		static WindowClass wndClass;
 		HINSTANCE hInst;
 	};
@@ -43,6 +44,8 @@ private:
 	static LRESULT CALLBACK HandleMsgStart(HWND hWnd, UINT msg,WPARAM wParam,LPARAM lParam);
 	static LRESULT CALLBACK HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+public:
+	Keyboard kbd;
 private:
 	int width;
 	int height;
