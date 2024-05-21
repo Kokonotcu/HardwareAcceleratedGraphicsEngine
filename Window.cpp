@@ -164,15 +164,24 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         case WM_CLOSE:
             PostQuitMessage(0);
             return 0;
+            //Clear keystate when lost focus
+        case WM_KILLFOCUS:
+            kbd.ClearState();
+            break;
+         /****************  KEYBOARD MESSAGES  **************************/
         case WM_KEYDOWN:
+        //Also handle sytem keys like ALT or F10
+        case WM_SYSKEYDOWN:
             kbd.OnKeyPressed(static_cast<unsigned char>(wParam), lParam);
             break;
         case WM_KEYUP:
+        case WM_SYSKEYUP:
             kbd.OnKeyReleased(static_cast<unsigned char>(wParam));
             break;
         case WM_CHAR:
             kbd.OnChar(static_cast<unsigned char>(wParam));
             break;
+         /****************  END KEYBOARD MESSAGES  **************************/
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }

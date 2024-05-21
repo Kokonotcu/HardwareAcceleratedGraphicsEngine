@@ -31,7 +31,7 @@ int APIENTRY wWinMain(
             TranslateMessage(&msg);
             DispatchMessage(&msg);
             Keyboard::Event e = wnd.kbd.ReadKey();
-            if (e.IsRelease() && e.GetCode() == VK_SPACE)
+            if (e.IsHold() && e.GetCode() == VK_MENU) 
             {
                 MessageBox(nullptr,"Something Happon!","Space Key Was Pressed",0);
             }
