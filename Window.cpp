@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Windowsx.h"
 #include <sstream>
 #include "resource.h"
 
@@ -181,7 +182,44 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         case WM_CHAR:
             kbd.OnChar(static_cast<unsigned char>(wParam));
             break;
-         /****************  END KEYBOARD MESSAGES  **************************/
+        /****************  END KEYBOARD MESSAGES  **************************/
+
+        /****************  MOUSE MESSAGES  **************************/
+        case WM_MOUSEMOVE:
+            POINTS pt = MAKEPOINTS(lParam);
+            mouse.OnMouseMove(pt.x,pt.y);
+            break;
+        case WM_LBUTTONDOWN:
+            mouse.OnLeftPressed();
+            break;
+        case WM_LBUTTONUP:
+            mouse.OnLeftReleased();
+            break;
+        case WM_RBUTTONDOWN:
+            mouse.OnRightPressed();
+            break;
+        case WM_RBUTTONUP:
+            mouse.OnRightReleased();
+            break;
+        case WM_MBUTTONDOWN:
+            mouse.OnMiddlePressed();
+            break;
+        case WM_MBUTTONUP:
+            mouse.OnMiddleReleased();
+            break;
+        case WM_MOUSEWHEEL:
+            if (GET_WHEEL_DELTA_WPARAM(wParam) > 0) 
+            {
+                mouse.WheelUp();
+            }
+            else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0) 
+            {
+                mouse.WheelDown(); 
+            }
+            break;
+
+        /****************  END MOUSE MESSAGES  **************************/
+
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }

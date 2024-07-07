@@ -33,7 +33,7 @@ int APIENTRY wWinMain(
             Keyboard::Event e = wnd.kbd.ReadKey();
             if (e.IsHold() && e.GetCode() == VK_MENU) 
             {
-                MessageBox(nullptr,"Something Happon!","Space Key Was Pressed",0);
+                MessageBox(nullptr,"Something Happon!","Alt key was pressed",0);
             }
         }
         if (result == -1)
