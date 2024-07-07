@@ -191,9 +191,30 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         /****************  END KEYBOARD MESSAGES  **************************/
 
         /****************  MOUSE MESSAGES  **************************/
-        case WM_MOUSEMOVE:
+        case WM_MOUSEMOVE: 
+        {
             const POINTS pt = MAKEPOINTS(lParam);
-            mouse.OnMouseMove(pt.x,pt.y);
+            mouse.OnMouseMove(pt.x, pt.y);
+
+            //In client region
+            if (pt.x >= 0 &&  pt.x < width && pt.y >= 0 && pt.y < height)
+            {
+                if (!mouse.IsInWindow())
+                {
+                    SetCapture(hWnd);
+                    mouse.OnMouseEnter();
+                }
+            }
+            //Outside client region
+            else 
+            {
+                if (!(mouse.leftIsPressed || mouse.rightIsPressed || mouse.middleIsPressed))
+                {
+                    ReleaseCapture();
+                    mouse.OnMouseLeave();
+                }
+            }
+        }
             break;
         case WM_LBUTTONDOWN:
             mouse.OnLeftPressed();
@@ -223,7 +244,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
                 mouse.WheelDown(); 
             }
             break;
-
+            
         /****************  END MOUSE MESSAGES  **************************/
 
     }

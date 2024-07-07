@@ -47,6 +47,8 @@ void Mouse::OnRightPressed() noexcept
 
 void Mouse::OnMiddlePressed() noexcept
 {
+    middleIsPressed = true;
+
     mouseBuffer.push(Mouse::Event(Mouse::Event::Type::MPress, *this));
     TrimBuffer();
 }
@@ -69,7 +71,23 @@ void Mouse::OnRightReleased() noexcept
 
 void Mouse::OnMiddleReleased() noexcept
 { 
+    middleIsPressed = false;
+
     mouseBuffer.push(Mouse::Event(Mouse::Event::Type::MRelease, *this));
+    TrimBuffer();
+}
+
+void Mouse::OnMouseEnter()noexcept 
+{
+    isInWindow = true;
+    mouseBuffer.push(Mouse::Event(Mouse::Event::Type::Enter, *this));
+    TrimBuffer();
+}
+
+void Mouse::OnMouseLeave()noexcept
+{
+    isInWindow = false;
+    mouseBuffer.push(Mouse::Event(Mouse::Event::Type::Leave, *this));
     TrimBuffer();
 }
 
