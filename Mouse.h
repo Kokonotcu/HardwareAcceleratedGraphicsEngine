@@ -84,6 +84,8 @@ public:
 	}
 
 
+	int wheelDeltaCarry = 0;
+
 private:
 	void OnMouseMove(float newX, float newY) noexcept;
 	void OnLeftPressed() noexcept;
@@ -95,16 +97,18 @@ private:
 	void OnMouseEnter() noexcept;
 	void OnMouseLeave() noexcept;
 
-	void WheelUp() noexcept;
-	void WheelDown() noexcept;
+	void OnWheelUp() noexcept;
+	void OnWheelDown() noexcept;
+	void OnWheelDelta(int delta) noexcept;
 
 	void TrimBuffer() noexcept;
 private:
-	static constexpr unsigned int bufferSize = 16u;
+	static constexpr unsigned int bufferSize = 64u;
 	bool leftIsPressed = false;
 	bool rightIsPressed = false;
 	bool middleIsPressed = false;
-	bool isInWindow = false; 
+	bool isInWindow = true; 
+	
 	int x;
 	int y;
 	std::queue<Event> mouseBuffer;

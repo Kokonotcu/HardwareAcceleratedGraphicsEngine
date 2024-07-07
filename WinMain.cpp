@@ -26,6 +26,8 @@ int APIENTRY wWinMain(
         MSG msg;
         BOOL result;
         //Keep getting messages from window in a loop
+        
+
         while ((result = GetMessage(&msg, nullptr, 0, 0) > 0))
         {
             // Translate message stuff
@@ -34,18 +36,10 @@ int APIENTRY wWinMain(
 
             // Do logic
             //Keyboard::Event e = wnd.kbd.ReadKey();
-            if (!wnd.mouse.IsEmpty()) 
-            {
-                const auto e = wnd.mouse.ReadEvent();
-                if (e.GetType() == Mouse::Event::Type::Move) 
-                {
-                    std::ostringstream oss;
-                    oss << "Mouse Position (" << e.GetPos().first << ", " << e.GetPos().second << ") ";
-                    oss << wnd.mouse.IsInWindow();
-                    wnd.SetTitle(oss.str());
-                }
-            }
+            //Mouse::Event e = wnd.mouse.ReadEvent();
+                 
         }
+
         if (result == -1)
         {
             return -1;

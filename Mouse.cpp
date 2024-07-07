@@ -1,3 +1,5 @@
+#define WHEEL_DELTA 120
+
 #include "Mouse.h"
 
 bool Mouse::KeyIsPressed(Event::Type _type) const noexcept
@@ -6,8 +8,17 @@ bool Mouse::KeyIsPressed(Event::Type _type) const noexcept
 }
 
 Mouse::Event Mouse::ReadEvent() noexcept
-{
-    return mouseBuffer.front();
+{   
+    if (mouseBuffer.size() > 0u) 
+    {
+        Mouse::Event e = mouseBuffer.front();
+        mouseBuffer.pop();
+        return e;
+    }
+    else 
+    {
+        return Mouse::Event();
+    }
 }
 
 std::pair<float, float> Mouse::GetPos() const noexcept
@@ -91,16 +102,32 @@ void Mouse::OnMouseLeave()noexcept
     TrimBuffer();
 }
 
-void Mouse::WheelUp() noexcept
+void Mouse::OnWheelUp() noexcept
 {
     mouseBuffer.push(Mouse::Event(Mouse::Event::Type::WheelUp, *this));
     TrimBuffer();
 }
 
-void Mouse::WheelDown() noexcept
+void Mouse::OnWheelDown() noexcept
 {
     mouseBuffer.push(Mouse::Event(Mouse::Event::Type::WheelDown, *this));
     TrimBuffer();
+}
+
+void Mouse::OnWheelDelta(int delta) noexcept 
+{
+    wheelDeltaCarry += delta;
+
+    while (wheelDeltaCarry >= WHEEL_DELTA) 
+    {
+        wheelDeltaCarry -= WHEEL_DELTA;
+        OnWheelUp();
+    }
+    while (wheelDeltaCarry <= -WHEEL_DELTA)
+    {
+        wheelDeltaCarry += WHEEL_DELTA;
+        OnWheelDown();
+    }
 }
 
 void Mouse::TrimBuffer() noexcept

@@ -195,7 +195,6 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         {
             const POINTS pt = MAKEPOINTS(lParam);
             mouse.OnMouseMove(pt.x, pt.y);
-
             //In client region
             if (pt.x >= 0 &&  pt.x < width && pt.y >= 0 && pt.y < height)
             {
@@ -206,16 +205,16 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
                 }
             }
             //Outside client region
-            else 
+            else
             {
-                if (!(mouse.leftIsPressed || mouse.rightIsPressed || mouse.middleIsPressed))
+                if (!(MK_LBUTTON | MK_RBUTTON | MK_MBUTTON))
                 {
                     ReleaseCapture();
                     mouse.OnMouseLeave();
                 }
             }
-        }
             break;
+        }
         case WM_LBUTTONDOWN:
             mouse.OnLeftPressed();
             break;
@@ -235,14 +234,8 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
             mouse.OnMiddleReleased();
             break;
         case WM_MOUSEWHEEL:
-            if (GET_WHEEL_DELTA_WPARAM(wParam) > 0) 
-            {
-                mouse.WheelUp();
-            }
-            else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0) 
-            {
-                mouse.WheelDown(); 
-            }
+            const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+            mouse.OnWheelDelta(delta);
             break;
             
         /****************  END MOUSE MESSAGES  **************************/
