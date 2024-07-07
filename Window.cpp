@@ -92,8 +92,6 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 }
 
 
-
-
 Window::Window(int width, int height, const char* name)
     :
     width(width),
@@ -105,7 +103,7 @@ Window::Window(int width, int height, const char* name)
     wr.right = wr.left + width;
     wr.top = 100;
     wr.bottom = wr.top + height; 
-    if ( FAILED(AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE)))
+    if ( AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
     {
         throw WND_LAST_EXCEPT();
     }
@@ -127,6 +125,14 @@ Window::Window(int width, int height, const char* name)
 Window::~Window()
 {
     DestroyWindow(hWnd);
+}
+
+void Window::SetTitle(const std::string& title) 
+{
+    if (SetWindowText( hWnd , title.c_str()) == 0 ) 
+    {
+        throw WND_LAST_EXCEPT();
+    }
 }
 
 LRESULT Window::HandleMsgStart(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -186,7 +192,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
         /****************  MOUSE MESSAGES  **************************/
         case WM_MOUSEMOVE:
-            POINTS pt = MAKEPOINTS(lParam);
+            const POINTS pt = MAKEPOINTS(lParam);
             mouse.OnMouseMove(pt.x,pt.y);
             break;
         case WM_LBUTTONDOWN:

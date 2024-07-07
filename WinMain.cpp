@@ -28,12 +28,21 @@ int APIENTRY wWinMain(
         //Keep getting messages from window in a loop
         while ((result = GetMessage(&msg, nullptr, 0, 0) > 0))
         {
+            // Translate message stuff
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+
+            // Do logic
             Keyboard::Event e = wnd.kbd.ReadKey();
-            if (e.IsHold() && e.GetCode() == VK_MENU) 
+            if (!wnd.mouse.IsEmpty()) 
             {
-                MessageBox(nullptr,"Something Happon!","Alt key was pressed",0);
+                const auto e = wnd.mouse.ReadEvent();
+                if (e.GetType() == Mouse::Event::Type::Move) 
+                {
+                    std::ostringstream oss;
+                    oss << "Mouse Position (" << e.GetPos().first << ", " << e.GetPos().second << ")";
+                    wnd.SetTitle(oss.str());
+                }
             }
         }
         if (result == -1)
