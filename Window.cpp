@@ -91,7 +91,6 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
     return wndClass.hInst;
 }
 
-
 Window::Window(int width, int height, const char* name)
     :
     width(width),
