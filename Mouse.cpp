@@ -33,8 +33,8 @@ void Mouse::Clear() noexcept
 
 void Mouse::OnMouseMove(float newX, float newY) noexcept
 {
-    x = newX;
-    y = newY;
+    x = (int)newX;
+    y = (int)newY;
 
     mouseBuffer.push(Mouse::Event(Mouse::Event::Type::Move,*this));
     TrimBuffer();

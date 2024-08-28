@@ -6,10 +6,10 @@ class Game
 {
 public:
 	Game();
-	int Start();
+	int ConstructLoop();
 private:
 	void Update();
+	void Start();
 private:
 	Window wnd;
-	float chronometer = 0.0f;
 };

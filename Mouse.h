@@ -37,8 +37,8 @@ public:
 		Event(Type _type, const Mouse& _parent) noexcept
 			:
 			type(_type),
-			x(_parent.x),
-			y(_parent.y)
+			x((float)_parent.x),
+			y((float)_parent.y)
 		{}
 		bool IsValid() const noexcept
 		{

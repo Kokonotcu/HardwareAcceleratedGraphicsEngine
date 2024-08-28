@@ -19,7 +19,7 @@ int APIENTRY wWinMain(
 {
     try 
     {        
-        Game{}.Start();
+        Game{}.ConstructLoop();
     }
     catch (const WndException& e) 
     {
