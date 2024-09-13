@@ -15,7 +15,9 @@ int Game::ConstructLoop()
         {
             return *errcode;
         }
+        wnd.Gfx().ClearBuffer(0.0f, 0.0f, 0.0f);
         Update();
+        wnd.Gfx().EndFrame();
     }
 }
 
@@ -24,13 +26,11 @@ void Game::Start()
     wnd.kbd.EnableAutorepeat();
 }
 
+//Time::delta();
 //Keyboard::Event e = wnd.kbd.ReadKey();
 //Mouse::Event e = wnd.mouse.ReadEvent();
+//wnd.Gfx().ClearBuffer(1.0f, 1.0f, 1.0f);
 void Game::Update()
 {   
-    Time::delta();
-    const float c = 0.0f;
-
-    wnd.Gfx().ClearBuffer(c, c, 1.0f);
-    wnd.Gfx().EndFrame();
+    wnd.Gfx().DrawTestTriangle();
 }
