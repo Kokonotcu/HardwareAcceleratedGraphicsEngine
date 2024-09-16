@@ -8,6 +8,7 @@ Game::Game()
 int Game::ConstructLoop()
 {
     Start();
+    wnd.mouse.Clear();
     while (true)
     {
         Time::CalculateDelta();
@@ -32,5 +33,15 @@ void Game::Start()
 //wnd.Gfx().ClearBuffer(1.0f, 1.0f, 1.0f);
 void Game::Update()
 {   
-    wnd.Gfx().DrawTestTriangle();
+    chronometer += Time::delta();
+    wnd.Gfx().DrawTestTriangle(
+        chronometer,
+        0.0f,
+        0.0f
+    );
+    wnd.Gfx().DrawTestTriangle(
+        -chronometer,
+        wnd.mouse.GetPos().first / 400.0f - 1.0f,
+        -wnd.mouse.GetPos().second / 300.0f + 1.0f
+    );
 }

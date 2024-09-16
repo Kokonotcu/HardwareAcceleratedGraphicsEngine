@@ -255,6 +255,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         }
         case WM_LBUTTONDOWN:
             mouse.OnLeftPressed();
+            SetForegroundWindow(hWnd);
             break;
         case WM_LBUTTONUP:
             mouse.OnLeftReleased();

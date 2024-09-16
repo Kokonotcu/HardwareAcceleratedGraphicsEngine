@@ -23,7 +23,7 @@ Mouse::Event Mouse::ReadEvent() noexcept
 
 std::pair<float, float> Mouse::GetPos() const noexcept
 {
-    return mouseBuffer.front().GetPos();
+    return std::pair<float, float>(x,y);
 }
 
 void Mouse::Clear() noexcept

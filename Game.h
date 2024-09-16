@@ -12,4 +12,5 @@ private:
 	void Start();
 private:
 	Window wnd;
+	float chronometer = 0.0f;
 };
