@@ -141,30 +141,36 @@ void Graphics::ClearBuffer(float red, float green, float blue) noexcept
 
 void Graphics::DrawTestTriangle(float angle, float x, float z)
 {
-	HRESULT hr;
-
-	struct Vertex
-	{
-		struct
+	
+		//
+		//Don't touch until all code is transferred
+		//
+		struct Vertex
 		{
-			float x;
-			float y;
-			float z;
-		} pos;
-	};
+			struct
+			{
+				float x;
+				float y;
+				float z;
+			} pos;
+		};
 
-	// create vertex buffer (1 2d triangle at center of screen)
-	Vertex vertices[] =
-	{
-		{ -1.0f,-1.0f,-1.0f },
-		{ 1.0f,-1.0f,-1.0f	},
-		{ -1.0f,1.0f,-1.0f	},
-		{ 1.0f,1.0f,-1.0f	},
-		{ -1.0f,-1.0f,1.0f,},
-		{ 1.0f,-1.0f,1.0f	},
-		{ -1.0f,1.0f,1.0f	},
-		{ 1.0f,1.0f,1.0f	},
-	};
+		// create vertex buffer (1 2d triangle at center of screen)
+		Vertex vertices[] =
+		{
+			{ -1.0f,-1.0f,-1.0f },
+			{ 1.0f,-1.0f,-1.0f	},
+			{ -1.0f,1.0f,-1.0f	},
+			{ 1.0f,1.0f,-1.0f	},
+			{ -1.0f,-1.0f,1.0f,},
+			{ 1.0f,-1.0f,1.0f	},
+			{ -1.0f,1.0f,1.0f	},
+			{ 1.0f,1.0f,1.0f	},
+		};
+		//
+		//Don't touch until all code is transferred
+		//
+	
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
 	D3D11_BUFFER_DESC bd = {};
@@ -246,11 +252,17 @@ void Graphics::DrawTestTriangle(float angle, float x, float z)
 			float g;
 			float b;
 			float a;
-		} face_colors[6];
+		} face_colors[12];
 	};
 	const ConstantBuffer2 cb2 =
 	{
 		{
+			{0.0f,0.6f,0.0f},
+			{1.0f,0.8f,0.83f},
+			{0.0f,1.0f,0.0f},
+			{0.0f,0.0f,1.0f},
+			{1.0f,1.0f,0.0f},
+			{0.0f,1.0f,1.0f},
 			{1.0f,0.0f,1.0f},
 			{1.0f,0.0f,0.0f},
 			{0.0f,1.0f,0.0f},

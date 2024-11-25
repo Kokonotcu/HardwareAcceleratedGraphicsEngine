@@ -2,7 +2,7 @@
 
 Game::Game()
 	:
-	wnd(800,600,"Retro Engine")
+	wnd(800,600,"Retr0 Engine")
 {}
 
 int Game::ConstructLoop()

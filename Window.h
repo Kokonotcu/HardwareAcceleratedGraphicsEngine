@@ -16,8 +16,6 @@ public:
 		using WndException::WndException;
 	public:
 		static std::string TranslateErrorCode(HRESULT hr) noexcept;
-		
-		
 	private:
 		HRESULT hr;
 	};

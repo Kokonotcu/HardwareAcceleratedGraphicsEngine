@@ -58,6 +58,7 @@ public:
 private:
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;
+	HRESULT hr;
 #endif
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
