@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include"Window.h"
 #include"WindException.h"
+#include "Game.h"
 
 //These can be commented out after debugging
 #include <string>
@@ -17,31 +18,8 @@ int APIENTRY wWinMain(
 )
 {
     try 
-    {
-        //Create a window in the encapsulated Window class
-        Window wnd(800, 600, "Retr0 Engine");
-        wnd.kbd.EnableAutorepeat();
-
-        //msg handling 
-        MSG msg;
-        BOOL result;
-        //Keep getting messages from window in a loop
-        while ((result = GetMessage(&msg, nullptr, 0, 0) > 0))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-            Keyboard::Event e = wnd.kbd.ReadKey();
-            if (e.IsHold() && e.GetCode() == VK_MENU) 
-            {
-                MessageBox(nullptr,"Something Happon!","Space Key Was Pressed",0);
-            }
-        }
-        if (result == -1)
-        {
-            return -1;
-        }
-
-        return (int)msg.wParam;
+    {        
+        Game{}.ConstructLoop();
     }
     catch (const WndException& e) 
     {

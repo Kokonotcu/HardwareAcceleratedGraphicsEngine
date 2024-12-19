@@ -1,29 +1,31 @@
 #include "Window.h"
+#include "Windowsx.h"
 #include <sstream>
 #include "resource.h"
 
 Window::WindowClass Window::WindowClass::wndClass;
 
-Window::Exception::Exception(int line, const char* file, HRESULT hr) noexcept
+Window::HrException::HrException(int line, const char* file, HRESULT hr) noexcept
     :
-    WndException(line , file),
+    Exception(line, file),
     hr(hr)
-{
-}
+{}
 
-const char* Window::Exception::what()const noexcept
+const char* Window::HrException::what() const noexcept
 {
-    std::stringstream ss;
-    ss << GetType() << std::endl
-        << "[Error Code]" << GetErrorCode() << std::endl
-        << "[Description]" << GetErrorString() << std::endl
+    std::ostringstream oss;
+    oss << GetType() << std::endl
+        << "[Error Code] 0x" << std::hex << std::uppercase << GetErrorCode()
+        << std::dec << " (" << (unsigned long)GetErrorCode() << ")" << std::endl
+        << "[Description] " << GetErrorDescription() << std::endl
         << GetOriginString();
-    return ss.str().c_str();
+    whatBuffer = oss.str();
+    return whatBuffer.c_str();
 }
 
-const char* Window::Exception::GetType() const noexcept 
+const char* Window::HrException::GetType() const noexcept
 {
-    return "Wnd Window Exception";
+    return "Window Exception";
 }
 
 std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
@@ -44,14 +46,19 @@ std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
     return errorString;
 }
 
-HRESULT Window::Exception::GetErrorCode() const noexcept
+HRESULT Window::HrException::GetErrorCode() const noexcept
 {
     return hr;
 }
 
-std::string Window::Exception::GetErrorString() const noexcept
+std::string Window::HrException::GetErrorDescription() const noexcept
 {
-    return TranslateErrorCode(hr);
+    return Exception::TranslateErrorCode(hr);
+}
+
+const char* Window::NoGfxException::GetType() const noexcept
+{
+    return "Window Exception [No Graphics]";
 }
 
 Window::WindowClass::WindowClass() noexcept
@@ -90,9 +97,6 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
     return wndClass.hInst;
 }
 
-
-
-
 Window::Window(int width, int height, const char* name)
     :
     width(width),
@@ -104,7 +108,7 @@ Window::Window(int width, int height, const char* name)
     wr.right = wr.left + width;
     wr.top = 100;
     wr.bottom = wr.top + height; 
-    if ( FAILED(AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE)))
+    if ( AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
     {
         throw WND_LAST_EXCEPT();
     }
@@ -121,11 +125,52 @@ Window::Window(int width, int height, const char* name)
     }
     //Function to show the window ;D
     ShowWindow(hWnd, SW_SHOWDEFAULT);
+
+    pGfx = std::make_unique<Graphics>(hWnd);
 }
 
 Window::~Window()
 {
     DestroyWindow(hWnd);
+}
+
+void Window::SetTitle(const std::string& title) 
+{
+    if (SetWindowText( hWnd , title.c_str()) == 0 ) 
+    {
+        throw WND_LAST_EXCEPT();
+    }
+}
+
+std::optional<int> Window::ProcessMessage() noexcept
+{
+    //msg handling 
+    MSG msg;
+
+
+    //Keep getting messages from window
+    while (PeekMessage(&msg,nullptr,0,0,PM_REMOVE))
+    {
+        if (msg.message == WM_QUIT)
+        {
+            return msg.wParam;
+        }
+
+        // Translate message stuff
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    
+    return {};
+}
+
+Graphics& Window::Gfx()
+{
+    if (!pGfx)
+    {
+        throw WND_NOGFX_EXCEPT();
+    }
+    return *pGfx;
 }
 
 LRESULT Window::HandleMsgStart(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -181,7 +226,59 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         case WM_CHAR:
             kbd.OnChar(static_cast<unsigned char>(wParam));
             break;
-         /****************  END KEYBOARD MESSAGES  **************************/
+        /****************  END KEYBOARD MESSAGES  **************************/
+
+        /****************  MOUSE MESSAGES  **************************/
+        case WM_MOUSEMOVE: 
+        {
+            const POINTS pt = MAKEPOINTS(lParam);
+            mouse.OnMouseMove(pt.x, pt.y);
+            //In client region
+            if (pt.x >= 0 &&  pt.x < width && pt.y >= 0 && pt.y < height)
+            {
+                if (!mouse.IsInWindow())
+                {
+                    SetCapture(hWnd);
+                    mouse.OnMouseEnter();
+                }
+            }
+            //Outside client region
+            else
+            {
+                if (!(MK_LBUTTON | MK_RBUTTON | MK_MBUTTON))
+                {
+                    ReleaseCapture();
+                    mouse.OnMouseLeave();
+                }
+            }
+            break;
+        }
+        case WM_LBUTTONDOWN:
+            mouse.OnLeftPressed();
+            SetForegroundWindow(hWnd);
+            break;
+        case WM_LBUTTONUP:
+            mouse.OnLeftReleased();
+            break;
+        case WM_RBUTTONDOWN:
+            mouse.OnRightPressed();
+            break;
+        case WM_RBUTTONUP:
+            mouse.OnRightReleased();
+            break;
+        case WM_MBUTTONDOWN:
+            mouse.OnMiddlePressed();
+            break;
+        case WM_MBUTTONUP:
+            mouse.OnMiddleReleased();
+            break;
+        case WM_MOUSEWHEEL:
+            const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+            mouse.OnWheelDelta(delta);
+            break;
+            
+        /****************  END MOUSE MESSAGES  **************************/
+
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
